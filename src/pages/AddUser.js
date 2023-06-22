@@ -18,9 +18,14 @@ export default function AddUser() {
 
   function saveUser(event){
     event.preventDefault();
+    if (user.phone.length !== 10) {
+      toast.error('Phone number must be of 10 digits');
+      return;
+    }
+
     addUser(user)
     .then(()=>{
-      toast("user saved")
+      toast.success("user saved")
   setUser({
     name:"",
     email:"",
@@ -28,14 +33,17 @@ export default function AddUser() {
     phone:""
   })
     })
-    .catch(error=>console.log(error))
+    .catch(error=>{
+      console.log(error)
+      toast.error(error.response.data.message)
+    })
 
 
   }
 
 
   return (
-    <form className='w-[600px] mx-auto'>
+    <form onSubmit={saveUser} className='w-[600px] mx-auto'>
          <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base font-semibold leading-7 text-gray-900">User Information</h2>
 
@@ -48,6 +56,7 @@ export default function AddUser() {
                 <input
                   type="text"
                   name="name"
+                  required
                   value={user.name}
                   onChange={handleChange}
                   id="first-name"
@@ -68,6 +77,7 @@ export default function AddUser() {
                   id="email"
                   name="email"
                   value={user.email}
+                  required
                   onChange={handleChange}
                   type="email"
                   autoComplete="email"
@@ -83,6 +93,7 @@ export default function AddUser() {
                 <input
                   id="address"
                   name="address"
+                  required
                   value={user.address}
                   onChange={handleChange}
                   type="text"
@@ -100,8 +111,11 @@ export default function AddUser() {
               </label>
               <div className="mt-2">
                 <input
-                  type="text"
+                  type='tel'
                   name="phone"
+                  required
+              
+                  maxLength={10}
                   value={user.phone}
                   onChange={handleChange}
                   id="postal-code"
@@ -114,12 +128,18 @@ export default function AddUser() {
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
-          Cancel
+        <button type="button" className="text-sm font-semibold leading-6 text-gray-900" onClick={()=>{
+           setUser({
+    name:"",
+    email:"",
+    address:'',
+    phone:""
+  })
+        }}>
+          Clear
         </button>
         <button
           type="submit"
-          onClick={saveUser}
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Save

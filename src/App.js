@@ -12,8 +12,8 @@ function App() {
 
 
 <Routes>
-<Route path='/' element={<AddUser/>} ></Route>
-<Route path='/userList' element={<UserList/>}></Route>
+<Route path='/adduser' element={<AddUser/>} ></Route>
+<Route path='/' element={<UserList/>}></Route>
 
 
 </Routes>

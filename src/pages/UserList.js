@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { useNavigate, Navigate, Link, NavLink } from 'react-router-dom'
 import { deleteUser, getUsers, updateUser } from '../service/userService'
+import { toast } from 'react-hot-toast'
 
 export default function UserList() {
 
@@ -16,7 +17,7 @@ export default function UserList() {
     const callApi=async()=>{
       await getUsers()
       .then(response =>{ setUserData(response.data.dat)
-      console.log(response.data)
+      setLoading(false)
       })
       .catch(error=>
            console.log(error))  
@@ -24,15 +25,16 @@ export default function UserList() {
       }
        
     useEffect(() => {
-    
+      setLoading(true)
       callApi()
       }, [])
   
 
+      //function to handle delete request
     function handleDelete(id) {
         deleteUser(id)
         .then(res=>{
-            console.log(res.data.message)
+            toast(res.data.message)
             callApi()
         })
         .catch(error=>{
@@ -54,10 +56,12 @@ export default function UserList() {
         setNewUser({...newUser,[event.target.name]:val});
       }
 
- function updateNewUser(){
+ function updateNewUser(event){
+  event.preventDefault()
      updateUser(newUser,newUser._id)
      .then((res)=>{
         console.log(res.data.message)
+        toast('user updated successfully')
         setEdituser(false)
         callApi()
    
@@ -74,15 +78,15 @@ export default function UserList() {
 
             <div className='flex gap-2 flex-wrap'>
         {userData?.map((item)=>(
-            <div className='p-2 m-2 shadow-2xl rounded-md'>
-                <p>Name : {item.name}</p>
-                <p>Email : {item.email}</p>
-                <p>Address : {item.address}</p>
-                <p>Phone : {item.phone}</p>
-                <div className='flex justify-between'>
+            <div className='p-5 m-5 shadow-2xl rounded-md bg-slate-100'>
+                <p className='font-semibold'>Name : {item.name}</p>
+                <p className='font-semibold'>Email : {item.email}</p>
+                <p className='font-semibold'>Address : {item.address}</p>
+                <p className='font-semibold'>Phone : {item.phone}</p>
+                <div className='flex justify-between mt-5'>
 
-                <button className='bg-red-400 p-1 rounded-md mx-1' onClick={() =>handleDelete(item._id)}>Delete</button>
-                <button onClick={()=>handleUpdate(item)}>Update</button>
+                <button className='bg-red-500 p-1 font-semibold text-white rounded-md mx-1' onClick={() =>handleDelete(item._id)}>Delete</button>
+                <button className='bg-blue-400 p-1 font-semibold text-white rounded-md mx-1' onClick={()=>handleUpdate(item)}>Update</button>
                 </div>
             </div>
         ))}
@@ -90,7 +94,7 @@ export default function UserList() {
        </div>
        }
        {edituser &&  <div>
-        <form className='w-[600px] mx-auto'>
+        <form onSubmit={updateNewUser} className='w-[600px] mx-auto'>
          <div className="border-b border-gray-900/10 pb-12">
           <h2 className="text-base font-semibold leading-7 text-gray-900">User Information</h2>
 
@@ -103,6 +107,7 @@ export default function UserList() {
                 <input
                   type="text"
                   name="name"
+                  required
                   value={newUser.name}
                   onChange={handleChange}
                   id="first-name"
@@ -122,6 +127,7 @@ export default function UserList() {
                 <input
                   id="email"
                   name="email"
+                  required
                   value={newUser.email}
                   onChange={handleChange}
                   type="email"
@@ -138,6 +144,7 @@ export default function UserList() {
                 <input
                   id="address"
                   name="address"
+                  required
                   value={newUser.address}
                   onChange={handleChange}
                   type="text"
@@ -155,8 +162,10 @@ export default function UserList() {
               </label>
               <div className="mt-2">
                 <input
-                  type="text"
+                  type="tel"
                   name="phone"
+                  required
+                  maxLength={10}
                   value={newUser.phone}
                   onChange={handleChange}
                   id="postal-code"
@@ -174,7 +183,6 @@ export default function UserList() {
         </button>
         <button
           type="submit"
-          onClick={updateNewUser}
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
          Update
